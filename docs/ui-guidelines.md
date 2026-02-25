@@ -20,3 +20,17 @@
 ## Experiencia de Usuario (UX)
 - Al solicitar reagendado, usar un modal (diálogo) en lugar de ir a otra página.
 - Los botones de "Descargar PDF" deben ser visibles en el historial.
+
+## Identidad de la Plataforma (System Brand)
+Aunque cada doctora personaliza su portal con su logo, la "shell" del sistema (barras de navegación, botones de acción genéricos, modales) debe seguir la identidad de "SGP-Psi".
+
+- **Fuente Principal:** Inter o Sans-serif limpia.
+- **Color de Acento del Sistema:** `Indigo-600` (Para botones primarios como "Guardar", "Iniciar Sesión").
+- **Feedback Visual (Toast Notifications):**
+  - Usar librería `sonner` o `react-hot-toast`.
+  - Éxito: Verde, esquina superior derecha, auto-desaparece.
+  - Error: Rojo, debe ser dismissable (cerrable).
+  - Loading: Spinner dentro del botón deshabilitado.
+
+## Gestión de Estados Vacíos
+- Cuando una lista no tenga datos (ej. sin citas, sin hijos), mostrar una ilustración simple y un texto guía: "Aún no tienes citas agendadas".
