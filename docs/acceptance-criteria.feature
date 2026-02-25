@@ -41,8 +41,21 @@ Característica: Sistema de Gestión Psicopedagógica (SGP-Psi)
       Entonces el sistema valida las credenciales correctamente
       Pero el sistema deniega el acceso mostrando el error "No tienes pacientes registrados en este consultorio"
 
+    Escenario: CU-003 Aprobación de nuevo usuario por la doctora
+      Dado que la doctora tiene un usuario padre en estado "Pendiente de Aprobación"
+      Cuando la doctora accede a la sección "Nuevos Registros"
+      Y presiona el botón "Aprobar" para ese usuario
+      Entonces el estado del usuario cambia a "APPROVED"
+      Y el sistema envía un correo de confirmación al padre habilitando el acceso
+
   @citas @flujos
   Regla: Las citas deben gestionarse con un flujo de aprobación para cambios
+
+    Escenario: CU-004 Creación de nueva cita por la doctora
+      Dado que la doctora ha seleccionado un paciente y una fecha disponible
+      Cuando la doctora guarda la nueva cita
+      Entonces la cita se crea con estado "Agendada"
+      Y el sistema envía un correo de notificación al padre con los detalles de la cita
 
     Escenario: CU-005 Solicitud de reagendado enviada
       Dado que el padre tiene una cita agendada para el día "2023-12-10"
@@ -81,6 +94,13 @@ Característica: Sistema de Gestión Psicopedagógica (SGP-Psi)
   @comprobantes @validacion
   Regla: Los comprobantes deben ser válidos y verificables por terceros
 
+    Escenario: CU-008 Generación exitosa de comprobante en PDF
+      Dado que el padre visualiza una cita con estado "Completada"
+      Cuando el padre presiona el botón "Generar Justificante"
+      Entonces el sistema genera un documento PDF descargable
+      Y el PDF contiene los datos del paciente, fecha, firma y sello de la doctora
+      Y el PDF incluye un Código de Validación Único
+
     Escenario: CU-009 Validación exitosa de justificante
       Dado que existe un comprobante generado con código único "VAL-12345"
       Y que el tercero no ha iniciado sesión en el sistema
@@ -89,8 +109,14 @@ Característica: Sistema de Gestión Psicopedagógica (SGP-Psi)
       Entonces el sistema muestra una pantalla de confirmación verde
       Y el sistema muestra el mensaje "Comprobante Válido"
 
+    Escenario: CU-009 Validación fallida de justificante
+      Dado que un tercero accede a la URL "/validar-comprobante"
+      Cuando ingresa el código "FALSO-999"
+      Entonces el sistema muestra un mensaje de error
+      Y el mensaje indica "Código no encontrado o comprobante inválido"
+
   @admin @plataforma
-  Regla: La plataforma debe permitir la gestión de nuevas doctoras
+  Regla: La plataforma debe permitir la gestión de nuevas doctoras y contexto multi-portal
 
     Escenario: CU-010 Alta de nueva doctora por Super Admin
       Dado que el Super Admin ha iniciado sesión en el panel de administración
@@ -98,3 +124,11 @@ Característica: Sistema de Gestión Psicopedagógica (SGP-Psi)
       Y presiona "Crear Cuenta"
       Entonces el sistema crea el Tenant "dra-ana" con estado "TRIAL"
       Y se envía un correo de invitación a "ana@test.com"
+
+    Escenario: CU-011 Cambio de contexto exitoso entre consultorios
+      Dado que un padre tiene sesión activa en el portal de "Doctora María"
+      Y tiene hijos registrados también con "Doctora Juan"
+      Cuando accede directamente a la URL "/doctora-juan/dashboard"
+      Entonces el sistema valida sus permisos en el nuevo tenant
+      Y le permite el acceso sin necesidad de volver a loguearse
+      Y ve el listado de hijos correspondientes a "Doctora Juan"
