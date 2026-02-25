@@ -7,7 +7,7 @@
 **Precondición:** El padre posee el enlace/QR de una doctora específica.
 **Flujo Principal:**
 1. El padre accede a la ruta `/{slug-doctora}/registro`.
-2. El sistema muestra el formulario con el combo "Consultorio" preseleccionado con la doctora correspondiente al slug.
+2. El sistema detecta el slug y configura el contexto automáticamente (no requiere selección manual de consultorio si viene por URL).
 3. El padre ingresa datos (Nombre, Email, Teléfono, Password).
 4. El padre marca el checkbox obligatorio "Acepto Aviso de Privacidad".
 5. El padre presiona "Registrarse".
@@ -15,14 +15,17 @@
 7. El sistema muestra mensaje: "Registro exitoso. Espere aprobación."
 
 ### CU-002: Login (Inicio de Sesión)
-**Actor:** Usuario (Padre o Doctora).
+**Actor:** Usuario (Padre, Doctora o Super Admin).
 **Flujo Principal:**
-1. El usuario ingresa a `/{slug-doctora}/login`.
-2. El sistema muestra el combo de consultorio preseleccionado.
-3. El usuario ingresa credenciales.
-4. El sistema valida:
-   - Si es **Padre**: Verifica si tiene hijos asociados con la doctora seleccionada. Si sí, accede; si no, error.
-   - Si es **Doctora**: Verifica que el email coincida con la dueña del slug. Si sí, accede; si no, error.
+1. El usuario ingresa a la ruta correspondiente:
+   - `/{slug-doctora}/login` (Doctora o Padre).
+   - `/admin/login` (Super Admin).
+2. **Si accede por URL con slug:** El sistema presupone el consultorio (no muestra combo o lo muestra fijo).
+3. **Si accede por raíz:** El sistema muestra un selector de consultorio para elegir a dónde ir.
+4. El usuario ingresa credenciales.
+5. El sistema valida:
+   - **Si es Padre**: Verifica si tiene hijos asociados con la doctora seleccionada.
+   - **Si es Doctora**: Verifica que el email coincida con la dueña del slug.
 
 ### CU-003: Aprobación de Usuario
 **Actor:** Doctora.
@@ -89,3 +92,28 @@
 2. Ingresa el código manualmente.
 3. Sistema valida existencia.
 4. Muestra mensaje verde: "Comprobante Válido. Cita del [Fecha]".
+
+---
+
+## Módulo 4: Administración de la Plataforma (Super Admin)
+
+### CU-010: Onboarding de Nueva Doctora
+**Actor:** Super Admin.
+**Precondición:** El Super Admin ha iniciado sesión en `/admin/login`.
+**Flujo Principal:**
+1. El Super Admin accede al panel "Gestión de Consultorios".
+2. Presiona "Agregar Nueva Doctora".
+3. Completa datos básicos: Nombre, Email, y Slug deseado (ej: "doctora-maria").
+4. El sistema crea el registro en `Tenants` con estado `TRIAL`.
+5. El sistema crea el usuario con rol `DOCTOR` vinculado a ese Tenant.
+6. El sistema envía credenciales temporales al email de la doctora.
+
+### CU-011: Gestión de Sesión Multi-Portal (Padre)
+**Actor:** Padre (con hijos en múltiples consultorios).
+**Precondición:** El padre ya está autenticado en el sistema.
+**Flujo Principal:**
+1. El padre intenta acceder a un portal distinto (cambiando la URL).
+2. El sistema detecta que tiene sesión activa.
+3. **Validación:**
+   - Si tiene pacientes en el nuevo portal -> Acceso permitido automáticamente.
+   - Si NO tiene pacientes en el nuevo portal -> El sistema muestra mensaje: *"Tu usuario no tiene pacientes registrados en este consultorio"*.
