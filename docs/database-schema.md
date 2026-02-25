@@ -3,7 +3,7 @@
 ## Tabla: Users (Usuarios)
 - id (UUID)
 - email (String, Unique)
-- role (Enum: DOCTOR, PARENT)
+- role (Enum: SUPER_ADMIN, DOCTOR, PARENT)
 - status (Enum: ACTIVE, PENDING_APPROVAL)
 - created_at
 
@@ -14,6 +14,8 @@
 - logo_url (String)
 - signature_url (String) -> Para comprobantes
 - stamp_url (String) -> Para comprobantes
+- plan_status (Enum: TRIAL, ACTIVE, SUSPENDED) -> Control de suscripción SaaS
+- trial_ends_at (DateTime)
 
 ## Tabla: Profiles (Perfiles)
 - id (UUID)
@@ -46,3 +48,10 @@
 - appointment_id (FK -> Appointments)
 - url (String) -> Ruta segura
 - type (String)
+
+## Consideraciones de Infraestructura y Control
+
+### Gestión de Suscripciones (SaaS)
+El campo `plan_status` en la tabla `Tenants` permite controlar el acceso.
+- **Lógica:** Si `plan_status` es `SUSPENDED`, el portal debe bloquear el acceso a pacientes/doctores y mostrar mensaje de cuenta suspendida.
+- **Super Admin:** El rol `SUPER_ADMIN` accede mediante una ruta exclusiva (`/admin/login`) y no pertenece a un `Tenant` específico. Su función es crear nuevos Tenants y gestionar estados de cuenta.
