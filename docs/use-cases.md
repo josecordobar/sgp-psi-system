@@ -29,6 +29,7 @@
 
 ### CU-003: Aprobación de Usuario
 **Actor:** Doctora.
+**Precondición:** Existen usuarios padres en estado "Pendiente de Aprobación".
 **Flujo Principal:**
 1. La doctora ve una alerta en su panel "Nuevos Registros".
 2. Entra y visualiza datos del padre e hijos registrados.
@@ -41,28 +42,31 @@
 
 ### CU-004: Creación de Cita (Doctora)
 **Actor:** Doctora.
+**Precondición:** La doctora está en su panel de administración.
 **Flujo Principal:**
-1. Doctora selecciona hueco en calendario.
+1. Doctora selecciona hueco en calendario o presiona "Nueva Cita".
 2. Selecciona paciente de su lista.
-3. Ingresa fecha/hora.
+3. Ingresa fecha/hora y motivo.
 4. Guarda cita.
-5. Sistema envía email al padre con detalles.
+5. Sistema envía email al padre con detalles de la nueva cita.
 
 ### CU-005: Solicitud de Reagendado (Padre)
 **Actor:** Padre.
+**Precondición:** Existe una cita futura con estado "Agendada".
 **Flujo Principal:**
 1. Padre visualiza su próxima cita.
 2. Presiona "Solicitar Cambio".
 3. Ingresa motivo o propuesta.
 4. Sistema cambia estado de cita a `RESCHEDULE_REQUESTED`.
-5. Sistema notifica a la doctora.
+5. Sistema notifica a la doctora sobre la solicitud pendiente.
 
 ### CU-006: Resolución de Solicitud (Doctora)
 **Actor:** Doctora.
+**Precondición:** Existe una cita en estado `RESCHEDULE_REQUESTED`.
 **Flujo Principal:**
-1. Doctora ve solicitud en su panel.
+1. Doctora ve solicitud en su panel de notificaciones.
 2. Opciones: "Aprobar" (mover cita) o "Rechazar" (mantener original).
-3. Sistema notifica al padre la decisión por email.
+3. Sistema actualiza la cita y notifica al padre la decisión por email.
 
 ---
 
@@ -70,28 +74,31 @@
 
 ### CU-007: Consulta de Expediente (Padre)
 **Actor:** Padre.
+**Precondición:** El padre tiene pacientes asociados y aprobados.
 **Flujo Principal:**
 1. Padre selecciona un hijo de su lista.
 2. Visualiza historial de citas.
 3. Selecciona una cita pasada.
 4. Lee "Notas Públicas" y descarga archivos adjuntos (vía endpoint seguro).
-5. *Restricción:* No puede ver "Notas Privadas".
+5. *Restricción:* No puede ver "Notas Privadas" de la doctora.
 
 ### CU-008: Generación de Comprobante (Padre)
 **Actor:** Padre.
+**Precondición:** Existe al menos una cita con estado "Completada" o "Asistida".
 **Flujo Principal:**
-1. Padre busca cita asistida.
+1. Padre busca cita asistida en el historial.
 2. Presiona "Generar Justificante".
-3. Sistema genera PDF con: Logo, Datos Paciente, Fecha, Firma/Sello Doctora, Código de Validación.
-4. Navegador descarga el PDF.
+3. Sistema genera PDF con: Logo, Datos Paciente, Fecha, Firma/Sello Doctora, Código de Validación Único.
+4. Navegador descarga el PDF automáticamente.
 
 ### CU-009: Validación de Comprobante (Tercero)
-**Actor:** Tercero (sin login).
+**Actor:** Tercero (sin login - ej. Patrono).
+**Precondición:** El tercero posee un comprobante impreso con un código.
 **Flujo Principal:**
 1. Tercero accede a la URL impresa en el PDF (`/validar-comprobante`).
 2. Ingresa el código manualmente.
-3. Sistema valida existencia.
-4. Muestra mensaje verde: "Comprobante Válido. Cita del [Fecha]".
+3. Sistema valida existencia del código en la BD.
+4. Muestra mensaje verde: "Comprobante Válido. Cita del [Fecha] con [Doctora]".
 
 ---
 
