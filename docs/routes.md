@@ -1,7 +1,13 @@
 # Mapa de Rutas y Endpoints
 
+## Rutas del Super Admin (Aislado)
+Por seguridad, las rutas de administración global no se mezclan con los consultorios.
+- `/admin/login` -> Login exclusivo Super Admin.
+- `/admin/dashboard` -> Estadísticas globales y gestión de tenants.
+- `/admin/tenants` -> CRUD de Doctores (Tenants).
+
 ## Rutas Públicas (Sin Auth)
-- `/` -> Redirección o selector global.
+- `/` -> Redirección o selector global de consultorio.
 - `/{slug}` -> Landing de la doctora.
 - `/{slug}/login` -> Login.
 - `/{slug}/registro` -> Registro.
@@ -21,5 +27,5 @@
 
 ## API Endpoints (Backend)
 - `POST /api/auth/callback` -> Supabase Auth.
-- `GET /api/file/{id}` -> Descarga segura de archivos.
+- `GET /api/file/{id}` -> Descarga segura de archivos (verifica permisos).
 - `POST /api/campaigns` -> Envío de correos masivos.
